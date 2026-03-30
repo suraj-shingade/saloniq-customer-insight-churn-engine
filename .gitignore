@@ -1,0 +1,161 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.Python
+develop-eggs/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# ========================
+# ML / Data Science
+# ========================
+*.joblib
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.onnx
+*.pmml
+*.model
+*.npy
+*.npz
+mlruns/
+mlflow/
+wandb/
+*.tfevents*
+model_artifacts/
+models/*.bin
+*.xgb
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+*.ipynb_output/
+profile_default/
+ipython_config.py
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+.docker/
+
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.secret
+credentials.json
+secrets.yaml
+secrets.yml
+
+# ========================
+# Database
+# ========================
+*.sql.bak
+*.dump
+*.sqlite3
+*.db
+pgdata/
+
+# ========================
+# IDE & Editors
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+
+# ========================
+# OS Generated
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ========================
+# Logs & Temp
+# ========================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+*.cache
+
+# ========================
+# Testing & Coverage
+# ========================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+test-results/
+
+# ========================
+# Documentation Build
+# ========================
+docs/_build/
+site/
+
+# ========================
+# Node / Frontend (Chart.js CDN)
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnp.*

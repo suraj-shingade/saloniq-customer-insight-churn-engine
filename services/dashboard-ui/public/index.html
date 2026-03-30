@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalonIQ Intelligence Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-brand">
+                <span class="login-brand-name">SalonIQ</span>
+                <span class="login-brand-subtitle">Intelligence Platform</span>
+            </div>
+            <form id="login-form" autocomplete="off">
+                <h2 class="login-heading">Sign In</h2>
+                <div class="form-group">
+                    <label for="login-username" class="form-label">Username</label>
+                    <input type="text" id="login-username" class="form-control" value="admin" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-control" value="saloniq2026" autocomplete="current-password">
+                </div>
+                <div id="login-error" class="login-error"></div>
+                <button type="submit" class="btn btn-primary login-btn">Sign In</button>
+                <p class="login-demo-note">Demo credentials pre-filled</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-main" class="app-main" style="display:none;">
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-name">SalonIQ</span>
+                <span class="brand-subtitle">Intelligence Platform</span>
+            </div>
+            <div class="sidebar-divider"></div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-view="dashboard">
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="#" class="nav-link" data-view="at-risk">
+                    <span class="nav-label">At-Risk Customers</span>
+                </a>
+                <a href="#" class="nav-link" data-view="analytics">
+                    <span class="nav-label">Analytics</span>
+                </a>
+                <a href="#" class="nav-link" data-view="stylists">
+                    <span class="nav-label">Stylists</span>
+                </a>
+                <a href="#" class="nav-link" data-view="monitoring">
+                    <span class="nav-label">System Monitoring</span>
+                </a>
+                <a href="#" class="nav-link" data-view="case-study">
+                    <span class="nav-label">Case Study</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-version">SalonIQ v1.0</span>
+                <a href="#" id="sign-out-link" class="sign-out-link">Sign Out</a>
+            </div>
+        </aside>
+
+        <!-- Sidebar Toggle (mobile) -->
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="page-title" class="page-title">Dashboard</h1>
+                <div class="top-bar-actions">
+                    <label for="salon-selector" class="sr-only">Select Salon</label>
+                    <select id="salon-selector" class="form-control salon-selector">
+                        <option value="">Loading salons...</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="content-area">
+
+                <!-- View: Dashboard -->
+                <section id="view-dashboard" class="view active">
+
+                    <!-- Row 1: KPI Cards (6 cards) -->
+                    <div class="kpi-grid-6">
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Active Customers</div>
+                            <div class="kpi-value" id="kpi-active-customers">--</div>
+                            <div class="kpi-subtitle">Total active</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">At-Risk</div>
+                            <div class="kpi-value" id="kpi-at-risk">--</div>
+                            <div class="kpi-subtitle">Requiring attention</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Retention Rate</div>
+                            <div class="kpi-value" id="kpi-retention">--</div>
+                            <div class="kpi-subtitle">90-day trailing</div>
+                            <div class="kpi-trend" id="kpi-trend-retention"></div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">30-Day Revenue</div>
+                            <div class="kpi-value" id="kpi-revenue-30d">--</div>
+                            <div class="kpi-subtitle">Current period</div>
+                            <div class="kpi-trend" id="kpi-trend-revenue"></div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Avg Ticket Value</div>
+                            <div class="kpi-value" id="kpi-avg-ticket">--</div>
+                            <div class="kpi-subtitle">Per visit</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">No-Show Rate</div>
+                            <div class="kpi-value" id="kpi-noshow">--</div>
+                            <div class="kpi-subtitle">Last 30 days</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Action Items -->
+                    <div class="action-items-row">
+                        <div class="action-card card followup" id="action-followup">
+                            <div class="action-card-label">Follow-up Needed</div>
+                            <div class="action-card-count">--</div>
+                        </div>
+                        <div class="action-card card booking" id="action-booking">
+                            <div class="action-card-label">Book Appointment</div>
+                            <div class="action-card-count">--</div>
+                        </div>
+                        <div class="action-card card offer" id="action-offer">
+                            <div class="action-card-label">Offer Promotion</div>
+                            <div class="action-card-count">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Charts (3-column) -->
+                    <div class="chart-row-3">
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Risk Distribution</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-risk-dist"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Customer Segments</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-dashboard-segments"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Monthly Revenue Trend</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-mini-revenue"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Operational Intelligence (2-column) -->
+                    <div class="chart-row">
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Churn Drivers</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-churn-drivers"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Service Mix</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-dashboard-services"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Business Insights -->
+                    <div class="insights-section">
+                        <h3 class="section-title">AI-Powered Business Insights</h3>
+                        <div id="dashboard-insights-list">
+                            <div class="insight-item">Loading insights...</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 6: Performance Spotlight + Alerts -->
+                    <div class="spotlight-row">
+                        <div class="performer-card card" id="top-performer-card">
+                            <div class="performer-title">Top Performer</div>
+                            <div class="performer-name" id="performer-name">--</div>
+                            <div class="performer-stats">
+                                <div>
+                                    <div class="performer-stat-value" id="performer-revenue">--</div>
+                                    <div class="performer-stat-label">30d Revenue</div>
+                                </div>
+                                <div>
+                                    <div class="performer-stat-value" id="performer-customers">--</div>
+                                    <div class="performer-stat-label">Customers</div>
+                                </div>
+                                <div>
+                                    <div class="performer-stat-value" id="performer-share">--</div>
+                                    <div class="performer-stat-label">Revenue Share</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alerts-section">
+                            <h3 class="section-title">At-Risk Alerts</h3>
+                            <div class="table-wrapper card">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Risk Level</th>
+                                            <th>Customer Name</th>
+                                            <th>Churn %</th>
+                                            <th>Days Overdue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="alerts-tbody">
+                                        <tr><td colspan="4" class="empty-state">Loading data...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 7: Retention Trend (full-width) -->
+                    <div class="chart-card card" style="margin-bottom: 24px;">
+                        <h3 class="chart-title">Retention Trend</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-retention-trend"></canvas>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- View: At-Risk Customers -->
+                <section id="view-at-risk" class="view">
+                    <div class="at-risk-summary">
+                        <div class="summary-stat card">
+                            <div class="summary-stat-value" id="at-risk-total">--</div>
+                            <div class="summary-stat-label">Total At-Risk</div>
+                        </div>
+                        <div class="summary-stat card">
+                            <div class="summary-stat-value" id="at-risk-critical">--</div>
+                            <div class="summary-stat-label">Critical</div>
+                        </div>
+                        <div class="summary-stat card">
+                            <div class="summary-stat-value" id="at-risk-avg-churn">--</div>
+                            <div class="summary-stat-label">Avg Churn Probability</div>
+                        </div>
+                        <div class="summary-stat card">
+                            <div class="summary-stat-value" id="at-risk-total-ltv">--</div>
+                            <div class="summary-stat-label">Total LTV at Risk</div>
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <select id="risk-filter" class="form-control">
+                            <option value="LOW">All Risk Levels</option>
+                            <option value="MEDIUM">Medium+</option>
+                            <option value="HIGH">High+</option>
+                            <option value="CRITICAL">Critical Only</option>
+                        </select>
+                        <input type="text" id="customer-search" class="form-control" placeholder="Search by customer name...">
+                        <span id="result-count" class="result-count"></span>
+                    </div>
+                    <div class="table-wrapper card">
+                        <table class="data-table clickable">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Risk Level</th>
+                                    <th>Churn %</th>
+                                    <th>Days Since Visit</th>
+                                    <th>Avg Interval</th>
+                                    <th>Est. LTV</th>
+                                    <th>Risk Factor</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="at-risk-tbody">
+                                <tr><td colspan="8" class="empty-state">Select a salon to view at-risk customers.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- View: Customer Detail -->
+                <section id="view-customer-detail" class="view">
+                    <button class="btn btn-outline btn-back" id="btn-back">&#8592; Back to List</button>
+
+                    <div class="customer-profile-header card">
+                        <div class="customer-identity">
+                            <h2 id="customer-name">--</h2>
+                            <span id="customer-id" class="text-muted">--</span>
+                        </div>
+                        <span id="customer-risk-badge" class="badge badge-low">--</span>
+                    </div>
+
+                    <div class="metric-grid">
+                        <div class="metric-card card">
+                            <div class="metric-label">Churn Risk</div>
+                            <div class="churn-ring" id="churn-ring">
+                                <span class="churn-ring-value" id="churn-ring-value">--</span>
+                            </div>
+                        </div>
+                        <div class="metric-card card">
+                            <div class="metric-label">Next Visit</div>
+                            <div class="metric-value" id="metric-next-visit">--</div>
+                            <div class="metric-sublabel">estimated days</div>
+                        </div>
+                        <div class="metric-card card">
+                            <div class="metric-label">12-Month LTV</div>
+                            <div class="metric-value" id="metric-ltv">--</div>
+                        </div>
+                        <div class="metric-card card">
+                            <div class="metric-label">Upsell Score</div>
+                            <div class="metric-value" id="metric-upsell">--</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-panels">
+                        <div class="panel card">
+                            <h3 class="panel-title">Risk Factors</h3>
+                            <div id="risk-factors-list" class="risk-factors-list">
+                                <p class="empty-state">No risk factors available.</p>
+                            </div>
+                        </div>
+                        <div class="panel card">
+                            <h3 class="panel-title">Visit History</h3>
+                            <div class="table-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Services</th>
+                                            <th>Amount</th>
+                                            <th>Stylist</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="visit-history-tbody">
+                                        <tr><td colspan="4" class="empty-state">No visit history available.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Analytics -->
+                <section id="view-analytics" class="view">
+                    <div class="kpi-grid">
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Total Revenue</div>
+                            <div class="kpi-value" id="analytics-revenue">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Total Visits</div>
+                            <div class="kpi-value" id="analytics-visits">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Avg Ticket</div>
+                            <div class="kpi-value" id="analytics-ticket">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Active Customers</div>
+                            <div class="kpi-value" id="analytics-customers">--</div>
+                        </div>
+                    </div>
+                    <div class="chart-grid-2x2">
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Revenue Trend</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-revenue-trend"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Customer Segments</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-segments"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Service Categories</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-services"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <h3 class="chart-title">Visit Frequency</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-visit-freq"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="insights-section" style="margin-top: 24px;">
+                        <h3 class="section-title">Key Observations</h3>
+                        <div id="analytics-observations-list">
+                            <div class="insight-item">Loading observations...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Stylist Performance -->
+                <section id="view-stylists" class="view">
+                    <div class="kpi-grid kpi-grid-3">
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Total Stylists</div>
+                            <div class="kpi-value" id="stylist-count">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Avg Revenue/Stylist</div>
+                            <div class="kpi-value" id="stylist-avg-revenue">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Top Performer</div>
+                            <div class="kpi-value" id="stylist-top">--</div>
+                        </div>
+                    </div>
+                    <div class="table-wrapper card" style="margin-bottom:24px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Stylist</th>
+                                    <th>Specialty</th>
+                                    <th>Experience</th>
+                                    <th>Customers</th>
+                                    <th>Visits</th>
+                                    <th>Revenue</th>
+                                    <th>Avg Ticket</th>
+                                    <th>Retention</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stylists-tbody">
+                                <tr><td colspan="8" class="empty-state">Loading stylist data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="chart-card card">
+                        <h3 class="chart-title">Revenue per Stylist</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-stylist-revenue"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: System Monitoring -->
+                <section id="view-monitoring" class="view">
+                    <div class="kpi-grid">
+                        <div class="status-card card" id="status-db">
+                            <div class="status-header">
+                                <span class="status-dot"></span>
+                                <span class="status-name">Database</span>
+                            </div>
+                            <span class="status-detail">--</span>
+                        </div>
+                        <div class="status-card card" id="status-redis">
+                            <div class="status-header">
+                                <span class="status-dot"></span>
+                                <span class="status-name">Redis Cache</span>
+                            </div>
+                            <span class="status-detail">--</span>
+                        </div>
+                        <div class="status-card card" id="status-features">
+                            <div class="status-header">
+                                <span class="status-dot"></span>
+                                <span class="status-name">Feature Store</span>
+                            </div>
+                            <span class="status-detail">--</span>
+                        </div>
+                        <div class="status-card card" id="status-predictions">
+                            <div class="status-header">
+                                <span class="status-dot"></span>
+                                <span class="status-name">Prediction Engine</span>
+                            </div>
+                            <span class="status-detail">--</span>
+                        </div>
+                    </div>
+
+                    <div class="section-row">
+                        <div class="panel card" style="flex:2;">
+                            <h3 class="panel-title">Model Performance</h3>
+                            <div class="table-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Model</th>
+                                            <th>Type</th>
+                                            <th>Version</th>
+                                            <th>Primary Metric</th>
+                                            <th>Value</th>
+                                            <th>Trained At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="models-tbody">
+                                        <tr><td colspan="6" class="empty-state">Loading model data...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="chart-card card" style="flex:1;">
+                            <h3 class="chart-title">Prediction Distribution</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-pred-dist"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-grid kpi-grid-3" style="margin-top:24px;">
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Total Customers</div>
+                            <div class="kpi-value" id="data-customers">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Total Visits</div>
+                            <div class="kpi-value" id="data-visits">--</div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-label">Total Salons</div>
+                            <div class="kpi-value" id="data-salons">--</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Case Study -->
+                <section id="view-case-study" class="view">
+                    <div class="case-study-hero card">
+                        <h2 class="hero-title">SalonIQ Pilot Program Results</h2>
+                        <p class="hero-subtitle">6-month deployment at Atelier KAZE, Tokyo</p>
+                        <p class="hero-details">6 stylists | 8 chairs | BASIC_PLUS tier | October 2025 - March 2026</p>
+                    </div>
+
+                    <h3 class="section-title">Before / After Comparison</h3>
+                    <div id="comparison-grid" class="comparison-grid">
+                        <p class="empty-state">Loading case study data...</p>
+                    </div>
+
+                    <div class="chart-card card chart-card-full">
+                        <h3 class="chart-title">Impact Visualization</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-case-study"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="panel card">
+                        <h3 class="panel-title">Key Insights</h3>
+                        <ul id="key-insights-list" class="insights-list">
+                            <li class="empty-state">Loading insights...</li>
+                        </ul>
+                    </div>
+
+                    <div class="panel card projection-panel">
+                        <h3 class="panel-title">Projected Network Impact (10,000 Salons)</h3>
+                        <div id="network-projection" class="projection-grid">
+                            <p class="empty-state">Loading projections...</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
