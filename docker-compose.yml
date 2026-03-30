@@ -1,0 +1,151 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: saloniq-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-saloniq}
+      POSTGRES_USER: ${POSTGRES_USER:-saloniq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-saloniq_dev_2026}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - saloniq-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: saloniq-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - saloniq-net
+
+  data-generator:
+    build:
+      context: ./services/data-generator
+    container_name: saloniq-data-generator
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-saloniq}
+      POSTGRES_USER: ${POSTGRES_USER:-saloniq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-saloniq_dev_2026}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - saloniq-net
+
+  feature-store:
+    build:
+      context: ./services/feature-store
+    container_name: saloniq-feature-store
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-saloniq}
+      POSTGRES_USER: ${POSTGRES_USER:-saloniq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-saloniq_dev_2026}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8001:8001"
+    depends_on:
+      data-generator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 120
+      start_period: 30s
+    networks:
+      - saloniq-net
+
+  ml-pipeline:
+    build:
+      context: ./services/ml-pipeline
+    container_name: saloniq-ml-pipeline
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-saloniq}
+      POSTGRES_USER: ${POSTGRES_USER:-saloniq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-saloniq_dev_2026}
+      MODEL_PATH: /app/models
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - model-artifacts:/app/models
+    depends_on:
+      feature-store:
+        condition: service_healthy
+    networks:
+      - saloniq-net
+
+  prediction-service:
+    build:
+      context: ./services/prediction-service
+    container_name: saloniq-prediction-service
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-saloniq}
+      POSTGRES_USER: ${POSTGRES_USER:-saloniq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-saloniq_dev_2026}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      MODEL_PATH: /app/models
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8002:8002"
+    volumes:
+      - model-artifacts:/app/models
+    depends_on:
+      ml-pipeline:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 120
+      start_period: 30s
+    networks:
+      - saloniq-net
+
+  dashboard-ui:
+    build:
+      context: ./services/dashboard-ui
+    container_name: saloniq-dashboard
+    ports:
+      - "3001:80"
+    depends_on:
+      prediction-service:
+        condition: service_healthy
+    networks:
+      - saloniq-net
+
+networks:
+  saloniq-net:
+    driver: bridge
+
+volumes:
+  pg-data:
+  model-artifacts:
